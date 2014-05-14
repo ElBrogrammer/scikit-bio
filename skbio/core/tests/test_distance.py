@@ -314,6 +314,11 @@ class DissimilarityMatrixTests(DissimilarityMatrixTestData):
             obs = dm.redundant_form()
             self.assertTrue(np.array_equal(obs, redundant))
 
+    #def test_filter_simple(self):
+    #    exp = DistanceMatrix([[0.0, 12.0], [12.0, 0.0]], ['b', 'c'])
+    #    obs = self.dm_3x3.filter(['b', 'c'])
+    #    self.assertEqual(obs, exp)
+
     def test_copy(self):
         """Test correct copying of a DissimilarityMatrix."""
         copy = self.dm_2x2.copy()
