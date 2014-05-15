@@ -423,29 +423,29 @@ class DissimilarityMatrix(object):
         """
         return self.__class__(self.data.T.copy(), deepcopy(self.ids))
 
-    def index(self, id_):
+    def index(self, lookup_id):
         """Return the index of the specified ID.
 
         Parameters
         ----------
-        id_ : str
+        lookup_id : str
             ID whose index will be returned.
 
         Returns
         -------
         int
-            Row/column index of `id_`.
+            Row/column index of `lookup_id`.
 
         Raises
         ------
         MissingIDError
-            If `id_` is not in the dissimilarity matrix.
+            If `lookup_id` is not in the dissimilarity matrix.
 
         """
-        if id_ in self._id_index:
-            return self._id_index[id_]
+        if lookup_id in self._id_index:
+            return self._id_index[lookup_id]
         else:
-            raise MissingIDError(id_)
+            raise MissingIDError(lookup_id)
 
     #def filter(self, ids, negate=False):
     #    idxs = self._id_index[index]
