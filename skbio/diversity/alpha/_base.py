@@ -77,7 +77,6 @@ def brillouin_d(counts):
 
        HB = \\frac{\\ln N!-\\sum^5_{i=1}{\\ln n_i!}}{N}
 
-
     Parameters
     ----------
     counts : 1-D array_like, int
@@ -455,7 +454,6 @@ def margalef(counts):
 
     where :math:`S` is the species number and :math:`N` is the
     total number of individuals (sum of abundances for all OTUs).
-
 
     Assumes log accumulation.
 
