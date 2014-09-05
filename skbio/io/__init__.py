@@ -17,6 +17,7 @@ Supported File Formats
 
    dm
    ordres
+   stockholm
 
 User Functions
 --------------
@@ -40,6 +41,7 @@ User Exceptions
    UnrecognizedFormatError
    DMFormatError
    OrdResFormatError
+   StockholmFormatError
 
 User Warnings
 -------------
@@ -109,7 +111,8 @@ from importlib import import_module
 from ._warning import FormatIdentificationWarning, ArgumentOverrideWarning
 from ._exception import (DuplicateRegistrationError, InvalidRegistrationError,
                          RecordError, FieldError, UnrecognizedFormatError,
-                         FileFormatError, DMFormatError, OrdResFormatError)
+                         FileFormatError, DMFormatError, OrdResFormatError,
+                         StockholmFormatError)
 from ._registry import (write, read, sniff, get_writer, get_reader,
                         get_sniffer, list_write_formats, list_read_formats,
                         register_writer, register_reader, register_sniffer)
@@ -120,13 +123,15 @@ __all__ = ['write', 'read', 'sniff', 'get_writer', 'get_reader',
            'DuplicateRegistrationError', 'InvalidRegistrationError',
            'RecordError', 'FieldError', 'UnrecognizedFormatError',
            'FileFormatError', 'DMFormatError', 'OrdResFormatError',
-           'FormatIdentificationWarning', 'ArgumentOverrideWarning']
+           'StockholmFormatError', 'FormatIdentificationWarning',
+           'ArgumentOverrideWarning']
 
 # Necessary to import each file format module to have them added to the I/O
 # registry. We use import_module instead of a typical import to avoid flake8
 # unused import errors.
 import_module('skbio.io.dm')
 import_module('skbio.io.ordres')
+import_module('skbio.io.stockholm')
 
 from numpy.testing import Tester
 test = Tester().test

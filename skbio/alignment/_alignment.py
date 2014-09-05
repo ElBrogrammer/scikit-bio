@@ -18,7 +18,7 @@ from scipy.stats import entropy
 
 from skbio.stats.distance import DistanceMatrix
 from skbio.io.util import open_file
-from ._exception import SequenceCollectionError, StockholmParseError
+from ._exception import SequenceCollectionError
 
 
 class SequenceCollection(object):

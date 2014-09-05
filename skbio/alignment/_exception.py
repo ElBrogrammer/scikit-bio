@@ -14,8 +14,3 @@ from skbio.io import FileFormatError
 class SequenceCollectionError(Exception):
     """General error for sequence collection validation failures."""
     pass
-
-
-class StockholmParseError(FileFormatError):
-    """Exception raised when a Stockholm formatted file cannot be parsed."""
-    pass
