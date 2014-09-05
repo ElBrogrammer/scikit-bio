@@ -68,12 +68,12 @@ def _alignment_to_stockholm(obj, fh):
 def _stockholm_alignment_to_stockholm(obj, fh):
     # find length of leader info needed to make file pretty
     # 10 comes from the characters for '#=GF ' and the feature after label
-    infolen = max(len(seq.id) for seq in obj._data) + 10
+    infolen = max(map(len, obj.ids())) + 10
 
     GF_lines = []
     GS_lines = []
     GC_lines = []
-    # NOTE: EVERYTHING MUST BE COERECED TO STR in case int or float passed
+    # NOTE: EVERYTHING MUST BE COERCED TO STR in case int or float passed
     # add GF information if applicable
     if obj.gf:
         skipfeatures = set(("NH", "RC", "RM", "RN", "RA", "RL"))
