@@ -30,8 +30,7 @@ from __future__ import absolute_import, division, print_function
 from future.utils import viewkeys, viewitems
 
 from skbio.alignment import Alignment, StockholmAlignment
-from skbio.io import (register_reader, register_writer, register_sniffer,
-                      StockholmFormatError)
+from skbio.io import register_reader, register_writer, register_sniffer
 
 
 @register_sniffer('stockholm')
@@ -152,6 +151,6 @@ def _stockholm_alignment_to_stockholm(obj, fh):
 
     sto_lines.extend(GC_lines)
     # add final slashes to end of file
-    sto_lines.append('//')
+    sto_lines.append('//\n')
 
     fh.write('\n'.join(sto_lines))
