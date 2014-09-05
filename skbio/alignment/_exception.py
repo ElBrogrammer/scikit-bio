@@ -8,8 +8,6 @@ from __future__ import absolute_import, division, print_function
 # The full license is in the file COPYING.txt, distributed with this software.
 # ----------------------------------------------------------------------------
 
-from skbio.io import FileFormatError
-
 
 class SequenceCollectionError(Exception):
     """General error for sequence collection validation failures."""
