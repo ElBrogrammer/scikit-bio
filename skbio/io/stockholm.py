@@ -4,7 +4,6 @@ Stockholm format (:mod:`skbio.io.stockholm`)
 
 .. currentmodule:: skbio.io.stockholm
 
-
 TODO fill in high-level description
 
 Format Specification
@@ -29,7 +28,7 @@ TODO fill in format parameters
 from __future__ import absolute_import, division, print_function
 from future.utils import viewkeys, viewitems
 
-from skbio.alignment import Alignment, StockholmAlignment
+from skbio.alignment import StockholmAlignment
 from skbio.io import register_reader, register_writer, register_sniffer
 
 
@@ -44,11 +43,6 @@ def _stockholm_to_generator(fh):
     pass
 
 
-@register_reader('stockholm', Alignment)
-def _stockholm_to_alignment(fh):
-    pass
-
-
 @register_reader('stockholm', StockholmAlignment)
 def _stockholm_to_stockholm_alignment(fh):
     pass
@@ -56,11 +50,6 @@ def _stockholm_to_stockholm_alignment(fh):
 
 @register_writer('stockholm')
 def _generator_to_stockholm(obj, fh):
-    pass
-
-
-@register_writer('stockholm', Alignment)
-def _alignment_to_stockholm(obj, fh):
     pass
 
 
