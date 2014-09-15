@@ -49,17 +49,26 @@ def _stockholm_to_stockholm_alignment(fh):
 
 
 @register_writer('stockholm')
-def _generator_to_stockholm(obj, fh):
-    pass
+def _generator_to_stockholm(gen, fh):
+    _write_header(fh)
+
+    for obj in gen:
+        _write_stockholm(obj, fh, write_header=False)
 
 
 @register_writer('stockholm', StockholmAlignment)
 def _stockholm_alignment_to_stockholm(obj, fh):
+    _write_stockholm(obj, fh)
+
+
+def _write_stockholm(obj, fh, write_header=True):
     # find length of leader info needed to make file pretty. 10 comes from the
     # characters for '#=GR ' and the feature after the sequence label
     spacing = max(map(len, obj.ids())) + 10
 
-    _write_header(fh)
+    if write_header:
+        _write_header(fh)
+
     _write_gf_markup(fh, obj.gf)
     _write_gs_markup(fh, obj.gs)
     _write_alignment_and_gr_markup(fh, obj, spacing)
