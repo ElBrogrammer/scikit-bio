@@ -1,0 +1,28 @@
+# STOCKHOLM 1.0
+#=GF AC RF00360
+#=GF BM cmbuild  -F CM SEED
+#=GF BM cmsearch  -Z 274931 -E 1000000
+#=GF SQ 9
+#=GF RN [1]
+#=GF RM 11469857
+#=GF RT TITLE1
+#=GF RA Auth1;
+#=GF RL J Mol Biol
+#=GF RN [2]
+#=GF RM 12007400
+#=GF RT TITLE2
+#=GF RA Auth2;
+#=GF RL Cell
+#=GS seq1 AC 111
+#=GS seq2 AC 222
+seq1          ACC-G-GGTA
+#=GR seq1 SS  1110101111
+seq2          TCC-G-GGCA
+#=GR seq2 SS  0110101110
+#=GC SS_cons  (((....)))
+//
+seq1          ACC-G-GGTA
+#=GR seq1 SS  1110101111
+seq2          TCC-G-GGCA
+#=GR seq2 SS  0110101110
+//

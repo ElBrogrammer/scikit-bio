@@ -14,11 +14,12 @@ from unittest import TestCase, main
 
 from skbio import DNASequence
 from skbio.alignment import StockholmAlignment
-from skbio.io.stockholm import _stockholm_alignment_to_stockholm
+from skbio.io.stockholm import (_stockholm_alignment_to_stockholm,
+                                _generator_to_stockholm)
 from skbio.util import get_data_path
 
 
-class StockholmAlignmentWriterTests(TestCase):
+class StockholmTests(TestCase):
     def setUp(self):
         seqs = [
             DNASequence("ACC-G-GGTA", id="seq1"),
@@ -76,7 +77,7 @@ class StockholmAlignmentWriterTests(TestCase):
              'stockholm_gf_only_trees', 'stockholm_gs_only',
              'stockholm_gr_only'])
 
-    def test_write(self):
+    def test_stockholm_alignment_to_stockholm(self):
         for obj, fp in zip(self.objs, self.fps):
             fh = StringIO()
             _stockholm_alignment_to_stockholm(obj, fh)
@@ -87,6 +88,51 @@ class StockholmAlignmentWriterTests(TestCase):
                 exp = fh.read()
 
             self.assertEqual(obs, exp)
+
+    def test_generator_to_stockholm_empty_generator(self):
+        # generator that doesn't yield anything
+        def empty_generator():
+            raise StopIteration()
+            yield
+
+        fh = StringIO()
+        _generator_to_stockholm(empty_generator(), fh)
+        obs = fh.getvalue()
+        fh.close()
+
+        exp = '# STOCKHOLM 1.0\n'
+        self.assertEqual(obs, exp)
+
+    def test_generator_to_stockholm_single_item(self):
+        for obj, fp in zip(self.objs, self.fps):
+            def single_item_generator():
+                yield obj
+
+            fh = StringIO()
+            _generator_to_stockholm(single_item_generator(), fh)
+            obs = fh.getvalue()
+            fh.close()
+
+            with open(fp, 'U') as fh:
+                exp = fh.read()
+
+            self.assertEqual(obs, exp)
+
+    def test_generator_to_stockholm_multiple_items(self):
+        def multiple_item_generator():
+            for obj in self.obj_all_markup, self.obj_gr_only:
+                yield obj
+
+        fh = StringIO()
+        _generator_to_stockholm(multiple_item_generator(), fh)
+        obs = fh.getvalue()
+        fh.close()
+
+        with open(get_data_path('stockholm_all_markup_and_gr_only'),
+                  'U') as fh:
+            exp = fh.read()
+
+        self.assertEqual(obs, exp)
 
 
 if __name__ == '__main__':
