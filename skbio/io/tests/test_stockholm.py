@@ -62,23 +62,17 @@ class StockholmTests(TestCase):
         self.obj_gr_only = StockholmAlignment(
             seqs, gc=None, gf=None, gs=None, gr=gr)
 
-        self.objs = [
-            self.obj_all_markup,
-            self.obj_gc_only,
-            self.obj_gf_only,
-            self.obj_gf_only_trees,
-            self.obj_gs_only,
-            self.obj_gr_only
-        ]
-
-        self.fps = map(
-            get_data_path,
-            ['stockholm_all_markup', 'stockholm_gc_only', 'stockholm_gf_only',
-             'stockholm_gf_only_trees', 'stockholm_gs_only',
-             'stockholm_gr_only'])
+        self.objs_fps = map(lambda e: (e[0], get_data_path(e[1])), [
+            (self.obj_all_markup, 'stockholm_all_markup'),
+            (self.obj_gc_only, 'stockholm_gc_only'),
+            (self.obj_gf_only, 'stockholm_gf_only'),
+            (self.obj_gf_only_trees, 'stockholm_gf_only_trees'),
+            (self.obj_gs_only, 'stockholm_gs_only'),
+            (self.obj_gr_only, 'stockholm_gr_only')
+        ])
 
     def test_stockholm_alignment_to_stockholm(self):
-        for obj, fp in zip(self.objs, self.fps):
+        for obj, fp in self.objs_fps:
             fh = StringIO()
             _stockholm_alignment_to_stockholm(obj, fh)
             obs = fh.getvalue()
@@ -104,7 +98,7 @@ class StockholmTests(TestCase):
         self.assertEqual(obs, exp)
 
     def test_generator_to_stockholm_single_item(self):
-        for obj, fp in zip(self.objs, self.fps):
+        for obj, fp in self.objs_fps:
             def single_item_generator():
                 yield obj
 
