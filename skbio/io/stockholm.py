@@ -225,6 +225,13 @@ def _parse_gf_info(lines):
         parsed[feature].append(content)
         lastline = feature
 
+    if rt:
+        rtline = " ".join(rt)
+        parsed["RT"].append(rtline)
+    if nh:
+        nhline = " ".join(nh)
+        parsed["NH"].append(nhline)
+
     # removing unneccessary lists from parsed. Use .items() for py3 support
     for feature, value in parsed.items():
         # list of multi-line features to join into single string if needed
@@ -282,10 +289,12 @@ def _parse_gs_gr_info(lines, strict=False, seqlen=-1):
         elif init != parsetype:
                 raise StockholmFormatError("Non-GS/GR line encountered!")
 
-        # parse each line, taking into account interleaved format
-        if feature in parsed and label in parsed[feature]:
-            # interleaved format, so need list of content
-            parsed[feature][label].append(content)
+        if feature in parsed:
+            if label in parsed[feature]:
+                # interleaved format, so need list of content
+                parsed[feature][label].append(content)
+            else:
+                parsed[feature][label] = [content]
         else:
             parsed[feature] = {label: [content]}
 
