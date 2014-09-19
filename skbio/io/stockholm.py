@@ -87,6 +87,7 @@ from future.utils import viewkeys, viewitems
 from collections import defaultdict, OrderedDict
 
 from skbio.alignment import StockholmAlignment
+from skbio.sequence import BiologicalSequence
 from skbio.io import (register_reader, register_writer, register_sniffer,
                       StockholmFormatError)
 
@@ -97,12 +98,14 @@ def _stockholm_sniffer(fh):
 
 
 @register_reader('stockholm')
-def _stockholm_to_generator(fh, seq_constructor, strict=False):
+def _stockholm_to_generator(fh, seq_constructor=BiologicalSequence,
+                            strict=False):
     return _read_stockholm_records(fh, seq_constructor, strict)
 
 
 @register_reader('stockholm', StockholmAlignment)
-def _stockholm_to_stockholm_alignment(fh, seq_constructor, strict=False):
+def _stockholm_to_stockholm_alignment(fh, seq_constructor=BiologicalSequence,
+                                      strict=False):
     obj = next(_read_stockholm_records(fh, seq_constructor, strict), None)
     if obj is None:
         raise StockholmFormatError("Stockholm file must contain at least one "

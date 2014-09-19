@@ -12,18 +12,19 @@ from future.utils.six import StringIO
 from collections import OrderedDict
 from unittest import TestCase, main
 
-from skbio import DNASequence
+from skbio import DNA
 from skbio.alignment import StockholmAlignment
-from skbio.io.stockholm import (_stockholm_alignment_to_stockholm,
-                                _generator_to_stockholm)
+from skbio.io.stockholm import (
+    _stockholm_to_stockholm_alignment, _stockholm_to_generator,
+    _stockholm_alignment_to_stockholm, _generator_to_stockholm)
 from skbio.util import get_data_path
 
 
 class StockholmTests(TestCase):
     def setUp(self):
         seqs = [
-            DNASequence("ACC-G-GGTA", id="seq1"),
-            DNASequence("TCC-G-GGCA", id="seq2")
+            DNA("ACC-G-GGTA", id="seq1"),
+            DNA("TCC-G-GGCA", id="seq2")
         ]
         gf = OrderedDict([
             ("AC", "RF00360"),
@@ -44,41 +45,64 @@ class StockholmTests(TestCase):
                                  ("seq2", "0110101110")])}
         gc = {"SS_cons": "(((....)))"}
 
+        self.obj_no_markup = StockholmAlignment(seqs)
+
         self.obj_all_markup = StockholmAlignment(
             seqs, gc=gc, gf=gf, gs=gs, gr=gr)
 
-        self.obj_gc_only = StockholmAlignment(
-            seqs, gc=gc, gf=None, gs=None, gr=None)
+        self.obj_gc_only = StockholmAlignment(seqs, gc=gc)
 
-        self.obj_gf_only = StockholmAlignment(
-            seqs, gc=None, gf=gf, gs=None, gr=None)
+        self.obj_gf_only = StockholmAlignment(seqs, gf=gf)
 
-        self.obj_gf_only_trees = StockholmAlignment(
-            seqs, gc=None, gf=gf_trees, gs=None, gr=None)
+        self.obj_gf_only_trees = StockholmAlignment(seqs, gf=gf_trees)
 
-        self.obj_gs_only = StockholmAlignment(
-            seqs, gc=None, gf=None, gs=gs, gr=None)
+        self.obj_gs_only = StockholmAlignment(seqs, gs=gs)
 
-        self.obj_gr_only = StockholmAlignment(
-            seqs, gc=None, gf=None, gs=None, gr=gr)
+        self.obj_gr_only = StockholmAlignment(seqs, gr=gr)
 
-        self.objs_fps = map(lambda e: (e[0], get_data_path(e[1])), [
-            (self.obj_all_markup, 'stockholm_all_markup'),
-            (self.obj_gc_only, 'stockholm_gc_only'),
-            (self.obj_gf_only, 'stockholm_gf_only'),
-            (self.obj_gf_only_trees, 'stockholm_gf_only_trees'),
-            (self.obj_gs_only, 'stockholm_gs_only'),
-            (self.obj_gr_only, 'stockholm_gr_only')
+        # Maps StockholmAlignment object to files that should be read into an
+        # equivalent structure. The first file in each entry should be what the
+        # object serializes to.
+        self.objs_fps = map(lambda e: (e[0], map(get_data_path, e[1])), [
+            (self.obj_no_markup, ('stockholm_no_markup',
+                                  'stockholm_no_markup_interleaved')),
+            (self.obj_all_markup, ('stockholm_all_markup',)),
+            (self.obj_gc_only, ('stockholm_gc_only',)),
+            (self.obj_gf_only, ('stockholm_gf_only',)),
+            (self.obj_gf_only_trees, ('stockholm_gf_only_trees',)),
+            (self.obj_gs_only, ('stockholm_gs_only',)),
+            (self.obj_gr_only, ('stockholm_gr_only',))
         ])
 
+    def _assert_stockholm_alignments_equal(self, observed, expected):
+        """Compare StockholmAlignments strictly."""
+        # TODO remove this custom equality testing code when StockholmAlignment
+        # has an equals method (part of #656). We need this method to include
+        # IDs and markup in the comparison (not part of
+        # SequenceCollection.__eq__).
+        self.assertEqual(observed, expected)
+        for obs_seq, exp_seq in zip(observed, expected):
+            self.assertTrue(obs_seq.equals(exp_seq))
+        self.assertEqual(observed.gf, expected.gf)
+        self.assertEqual(observed.gs, expected.gs)
+        self.assertEqual(observed.gr, expected.gr)
+        self.assertEqual(observed.gc, expected.gc)
+
+    def test_stockholm_to_stockholm_alignment(self):
+        for obj, fps in self.objs_fps:
+            for fp in fps:
+                obs = _stockholm_to_stockholm_alignment(
+                    fp, seq_constructor=DNA)
+                self._assert_stockholm_alignments_equal(obs, obj)
+
     def test_stockholm_alignment_to_stockholm(self):
-        for obj, fp in self.objs_fps:
+        for obj, fps in self.objs_fps:
             fh = StringIO()
             _stockholm_alignment_to_stockholm(obj, fh)
             obs = fh.getvalue()
             fh.close()
 
-            with open(fp, 'U') as fh:
+            with open(fps[0], 'U') as fh:
                 exp = fh.read()
 
             self.assertEqual(obs, exp)
@@ -98,7 +122,7 @@ class StockholmTests(TestCase):
         self.assertEqual(obs, exp)
 
     def test_generator_to_stockholm_single_item(self):
-        for obj, fp in self.objs_fps:
+        for obj, fps in self.objs_fps:
             def single_item_generator():
                 yield obj
 
@@ -107,7 +131,7 @@ class StockholmTests(TestCase):
             obs = fh.getvalue()
             fh.close()
 
-            with open(fp, 'U') as fh:
+            with open(fps[0], 'U') as fh:
                 exp = fh.read()
 
             self.assertEqual(obs, exp)
