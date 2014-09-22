@@ -68,7 +68,8 @@ class StockholmTests(TestCase):
                                   'stockholm_no_markup_interleaved')),
             (self.obj_all_markup, ('stockholm_all_markup',)),
             (self.obj_gc_only, ('stockholm_gc_only',)),
-            (self.obj_gf_only, ('stockholm_gf_only',)),
+            (self.obj_gf_only, ('stockholm_gf_only',
+                                'stockholm_gf_only_reordered')),
             (self.obj_gf_only_trees, ('stockholm_gf_only_trees',)),
             (self.obj_gs_only, ('stockholm_gs_only',)),
             (self.obj_gr_only, ('stockholm_gr_only',))

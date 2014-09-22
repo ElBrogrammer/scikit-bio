@@ -946,6 +946,7 @@ class StockholmAlignmentTests(TestCase):
         exp_sto = StockholmAlignment(self.seqs, self.GF, {}, {}, {})
         self.assertEqual(obs_sto, exp_sto)
 
+    # TODO finish porting reader tests from here until test_str
     def test_from_file_GC(self):
         """Make sure GC lines are parsed correctly"""
         sto = StringIO("# STOCKHOLM 1.0\n"
