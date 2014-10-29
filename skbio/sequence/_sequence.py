@@ -1447,39 +1447,6 @@ class BiologicalSequence(Sequence):
         """
         return self.copy(sequence=self.sequence.upper())
 
-    def _set_quality(self, quality):
-        if quality is not None:
-            quality = np.asarray(quality)
-
-            if quality.ndim == 0:
-                # We have something scalar-like, so create a single-element
-                # vector to store it.
-                quality = np.reshape(quality, 1)
-
-            if quality.shape == (0,):
-                # cannot safe cast an empty vector from float to int
-                cast_type = 'unsafe'
-            else:
-                cast_type = 'safe'
-
-            quality = quality.astype(int, casting=cast_type, copy=False)
-            quality.flags.writeable = False
-
-            if quality.ndim != 1:
-                raise BiologicalSequenceError(
-                    "Phred quality scores must be 1-D.")
-            if len(quality) != len(self):
-                raise BiologicalSequenceError(
-                    "Number of Phred quality scores (%d) must match the "
-                    "number of characters in the biological sequence (%d)." %
-                    (len(quality), len(self._sequence)))
-            if (quality < 0).any():
-                raise BiologicalSequenceError(
-                    "Phred quality scores must be greater than or equal to "
-                    "zero.")
-
-        self._quality = quality
-
     def regex_iter(self, regex, retrieve_group_0=False):
         """Find patterns specified by regular expression
 
@@ -1545,6 +1512,39 @@ class BiologicalSequence(Sequence):
                     yield hits
             else:
                 yield hits
+
+    def _set_quality(self, quality):
+        if quality is not None:
+            quality = np.asarray(quality)
+
+            if quality.ndim == 0:
+                # We have something scalar-like, so create a single-element
+                # vector to store it.
+                quality = np.reshape(quality, 1)
+
+            if quality.shape == (0,):
+                # cannot safe cast an empty vector from float to int
+                cast_type = 'unsafe'
+            else:
+                cast_type = 'safe'
+
+            quality = quality.astype(int, casting=cast_type, copy=False)
+            quality.flags.writeable = False
+
+            if quality.ndim != 1:
+                raise BiologicalSequenceError(
+                    "Phred quality scores must be 1-D.")
+            if len(quality) != len(self):
+                raise BiologicalSequenceError(
+                    "Number of Phred quality scores (%d) must match the "
+                    "number of characters in the biological sequence (%d)." %
+                    (len(quality), len(self._sequence)))
+            if (quality < 0).any():
+                raise BiologicalSequenceError(
+                    "Phred quality scores must be greater than or equal to "
+                    "zero.")
+
+        self._quality = quality
 
 
 class NucleotideSequence(BiologicalSequence):
