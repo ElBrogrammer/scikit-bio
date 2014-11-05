@@ -1,5 +1,3 @@
-#! /usr/bin/env python
-
 # ----------------------------------------------------------------------------
 # Copyright (c) 2013--, scikit-bio development team.
 #
@@ -10,11 +8,13 @@
 
 from __future__ import absolute_import, division, print_function
 from six import StringIO
+
+from functools import partial
 from unittest import TestCase, main
 
 import numpy as np
-import numpy.testing as npt
 import pandas as pd
+from pandas.util.testing import assert_series_equal
 
 from skbio import DistanceMatrix
 from skbio.stats.distance import ANOSIM
@@ -61,47 +61,43 @@ class ANOSIMTests(TestCase):
         self.anosim_ties_df = ANOSIM(self.dm_ties, df, column='Group')
         self.anosim_unequal = ANOSIM(self.dm_unequal, grouping_unequal)
 
+        self.exp_index = ['Method name', 'Sample size', 'Number of groups',
+                          'R statistic', 'p-value', 'Number of permutations']
+        self.assert_series_equal = partial(assert_series_equal,
+                                           check_index_type=True,
+                                           check_series_type=True)
+
     def test_call_ties(self):
         # Ensure we get the same results if we rerun the method on the same
         # object. Also ensure we get the same results if we run the method
         # using a grouping vector or a data frame with equivalent groupings.
+        exp = pd.Series(index=self.exp_index,
+                        data=['ANOSIM', 4, 2, 0.25, '0.671', 999])
         for inst in self.anosim_ties, self.anosim_ties_df:
             for trial in range(2):
                 np.random.seed(0)
                 obs = inst()
-                self.assertEqual(obs.sample_size, 4)
-                npt.assert_array_equal(obs.groups,
-                                       ['Control', 'Fast'])
-                self.assertAlmostEqual(obs.statistic, 0.25)
-                self.assertAlmostEqual(obs.p_value, 0.671)
-                self.assertEqual(obs.permutations, 999)
+                self.assert_series_equal(obs, exp)
 
     def test_call_no_ties(self):
+        exp = pd.Series(index=self.exp_index,
+                        data=['ANOSIM', 4, 2, 0.625, '0.332', 999])
         np.random.seed(0)
         obs = self.anosim_no_ties()
-        self.assertEqual(obs.sample_size, 4)
-        npt.assert_array_equal(obs.groups, ['Control', 'Fast'])
-        self.assertAlmostEqual(obs.statistic, 0.625)
-        self.assertAlmostEqual(obs.p_value, 0.332)
-        self.assertEqual(obs.permutations, 999)
+        self.assert_series_equal(obs, exp)
 
     def test_call_no_permutations(self):
+        exp = pd.Series(index=self.exp_index,
+                        data=['ANOSIM', 4, 2, 0.625, 'N/A', 0])
         obs = self.anosim_no_ties(0)
-        self.assertEqual(obs.sample_size, 4)
-        npt.assert_array_equal(obs.groups, ['Control', 'Fast'])
-        self.assertAlmostEqual(obs.statistic, 0.625)
-        self.assertEqual(obs.p_value, None)
-        self.assertEqual(obs.permutations, 0)
+        self.assert_series_equal(obs, exp)
 
     def test_call_unequal_group_sizes(self):
+        exp = pd.Series(index=self.exp_index,
+                        data=['ANOSIM', 6, 3, -0.363636, '0.878', 999])
         np.random.seed(0)
         obs = self.anosim_unequal()
-        self.assertEqual(obs.sample_size, 6)
-        npt.assert_array_equal(obs.groups,
-                               ['Control', 'Treatment1', 'Treatment2'])
-        self.assertAlmostEqual(obs.statistic, -0.363636, 6)
-        self.assertAlmostEqual(obs.p_value, 0.878)
-        self.assertEqual(obs.permutations, 999)
+        self.assert_series_equal(obs, exp)
 
 
 if __name__ == '__main__':

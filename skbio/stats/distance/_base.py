@@ -7,9 +7,8 @@
 # ----------------------------------------------------------------------------
 
 from __future__ import absolute_import, division, print_function
-from six import StringIO, string_types
+from six import string_types
 
-import csv
 import warnings
 from copy import deepcopy
 
@@ -867,11 +866,11 @@ class CategoricalStats(object):
         permutations : int, optional
             Number of permutations to use when calculating statistical
             significance. Must be >= 0. If 0, the resulting p-value will be
-            ``None``.
+            ``'N/A'``.
 
         Returns
         -------
-        CategoricalStatsResults
+        pandas.Series
             Results of the method, including test statistic and p-value.
 
         .. shownumpydoc
@@ -893,113 +892,13 @@ class CategoricalStats(object):
 
             p_value = ((perm_stats >= stat).sum() + 1) / (permutations + 1)
 
-        return CategoricalStatsResults(self.short_method_name,
-                                       self.long_method_name,
-                                       self.test_statistic_name,
-                                       self._dm.shape[0], self._groups, stat,
-                                       p_value, permutations)
+        p_value_str = p_value_to_str(p_value, permutations)
+        return pd.Series(
+            data=[self.short_method_name, self._dm.shape[0], len(self._groups),
+                  stat, p_value_str, permutations],
+            index=['Method name', 'Sample size', 'Number of groups',
+                   self.test_statistic_name, 'p-value',
+                   'Number of permutations'])
 
     def _run(self, grouping):
         raise NotImplementedError("Subclasses must implement _run().")
-
-
-class CategoricalStatsResults(object):
-    """Statistical method results container.
-
-    Stores the results of running a `CategoricalStats` method a single time,
-    and provides a way to format the results.
-
-    Attributes
-    ----------
-    short_method_name
-    long_method_name
-    test_statistic_name
-    sample_size
-    groups
-    statistic
-    p_value
-    permutations
-
-    Notes
-    -----
-    Users will generally not directly instantiate objects of this class. The
-    various categorical statistical methods will return an object of this type
-    when they are run.
-
-    """
-
-    def __init__(self, short_method_name, long_method_name,
-                 test_statistic_name, sample_size, groups, statistic, p_value,
-                 permutations):
-        self.short_method_name = short_method_name
-        self.long_method_name = long_method_name
-        self.test_statistic_name = test_statistic_name
-        self.sample_size = sample_size
-        self.groups = groups
-        self.statistic = statistic
-        self.p_value = p_value
-        self.permutations = permutations
-
-    def __str__(self):
-        """Return pretty-print (fixed width) string."""
-        rows = (self._format_header(), self._format_data())
-
-        max_widths = []
-        for col_idx in range(len(rows[0])):
-            max_widths.append(max(map(lambda e: len(e[col_idx]), rows)))
-
-        results = []
-        for row in rows:
-            padded_row = []
-            for col_idx, val in enumerate(row):
-                padded_row.append(val.rjust(max_widths[col_idx]))
-            results.append('  '.join(padded_row))
-
-        return '\n'.join(results) + '\n'
-
-    def _repr_html_(self):
-        """Return a string containing an HTML table of results.
-
-        This method will be called within the IPython Notebook instead of
-        __repr__ to display results.
-
-        """
-        header = self._format_header()
-        data = self._format_data()
-        return pd.DataFrame([data[1:]], columns=header[1:],
-                            index=[data[0]])._repr_html_()
-
-    def summary(self, delimiter='\t'):
-        """Return a formatted summary of results as a string.
-
-        The string is formatted as delimited text.
-
-        Parameters
-        ----------
-        delimiter : str, optional
-            String to delimit fields by in formatted output. Default is tab
-            (TSV).
-
-        Returns
-        -------
-        str
-            Delimited-text summary of results.
-
-        """
-        summary = StringIO()
-        csv_writer = csv.writer(summary, delimiter=delimiter,
-                                lineterminator='\n')
-        csv_writer.writerow(self._format_header())
-        csv_writer.writerow(self._format_data())
-        return summary.getvalue()
-
-    def _format_header(self):
-        return ('Method name', 'Sample size', 'Number of groups',
-                self.test_statistic_name, 'p-value', 'Number of permutations')
-
-    def _format_data(self):
-        p_value_str = p_value_to_str(self.p_value, self.permutations)
-
-        return (self.short_method_name, '%d' % self.sample_size,
-                '%d' % len(self.groups), str(self.statistic), p_value_str,
-                '%d' % self.permutations)

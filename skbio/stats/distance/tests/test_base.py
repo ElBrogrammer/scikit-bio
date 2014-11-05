@@ -19,7 +19,7 @@ import pandas as pd
 from skbio import DistanceMatrix
 from skbio.stats.distance import (
     DissimilarityMatrixError, DistanceMatrixError, MissingIDError,
-    DissimilarityMatrix, randdm, CategoricalStatsResults)
+    DissimilarityMatrix, randdm)
 from skbio.stats.distance._base import CategoricalStats
 
 
@@ -602,39 +602,6 @@ class CategoricalStatsTests(TestCase):
     def test_call_invalid_permutations(self):
         with self.assertRaises(ValueError):
             self.categorical_stats(-1)
-
-
-class CategoricalStatsResultsTests(TestCase):
-    def setUp(self):
-        self.results = CategoricalStatsResults('foo', 'Foo', 'my stat', 42,
-                                               ['a', 'b', 'c', 'd'],
-                                               0.01234567890, 0.1151111, 99)
-
-    def test_str(self):
-        exp = ('Method name  Sample size  Number of groups       my stat  '
-               'p-value  Number of permutations\n        foo           42'
-               '                 4  0.0123456789     0.12'
-               '                      99\n')
-        obs = str(self.results)
-        self.assertEqual(obs, exp)
-
-    def test_repr_html(self):
-        # Not going to test against exact HTML that we expect, as this could
-        # easily break and be annoying to constantly update. Do some light
-        # sanity-checking to ensure there are some of the expected HTML tags.
-        obs = self.results._repr_html_()
-        self.assertTrue('<table' in obs)
-        self.assertTrue('<thead' in obs)
-        self.assertTrue('<tr' in obs)
-        self.assertTrue('<th' in obs)
-        self.assertTrue('<tbody' in obs)
-        self.assertTrue('<td' in obs)
-
-    def test_summary(self):
-        exp = ('Method name\tSample size\tNumber of groups\tmy stat\tp-value\t'
-               'Number of permutations\nfoo\t42\t4\t0.0123456789\t0.12\t99\n')
-        obs = self.results.summary()
-        self.assertEqual(obs, exp)
 
 
 if __name__ == '__main__':

@@ -154,7 +154,6 @@ Categorical Variable Stats
 
    ANOSIM
    PERMANOVA
-   CategoricalStatsResults
 
 Continuous Variable Stats
 ^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -192,55 +191,41 @@ Create an ANOSIM instance and run the method with 99 permutations:
 >>> np.random.seed(0) # Make output deterministic; not necessary for normal use
 >>> from skbio.stats.distance import ANOSIM
 >>> anosim = ANOSIM(dm, grouping)
->>> results = anosim(99)
->>> print results
-Method name  Sample size  Number of groups  R statistic  p-value  \
-Number of permutations
-     ANOSIM            4                 2         0.25     0.67  \
-                    99
-<BLANKLINE>
+>>> anosim(99)
+Method name               ANOSIM
+Sample size                    4
+Number of groups               2
+R statistic                 0.25
+p-value                     0.67
+Number of permutations        99
+dtype: object
+
+The return value is a ``pandas.Series`` object containing the results of the
+statistical test.
 
 It is possible to rerun a method using an existing instance. Rerun ANOSIM with
 999 permutations this time. Note that we obtain the same R statistic as before:
 
->>> results = anosim(999)
->>> print results
-Method name  Sample size  Number of groups  R statistic  p-value  \
-Number of permutations
-     ANOSIM            4                 2         0.25    0.667  \
-                   999
-<BLANKLINE>
+>>> anosim(999)
+Method name               ANOSIM
+Sample size                    4
+Number of groups               2
+R statistic                 0.25
+p-value                    0.667
+Number of permutations       999
+dtype: object
 
 To suppress calculation of the p-value and only obtain the R statistic, specify
 zero permutations:
 
->>> results = anosim(0)
->>> print results
-Method name  Sample size  Number of groups  R statistic  p-value  \
-Number of permutations
-     ANOSIM            4                 2         0.25      N/A  \
-                     0
-<BLANKLINE>
-
-A statistical results object can also format its results as delimited text.
-This is useful, for example, if you want to view the results in a spreadsheet
-program such as Excel:
-
->>> print results.summary(delimiter=',')
-Method name,Sample size,Number of groups,R statistic,p-value,\
-Number of permutations
-ANOSIM,4,2,0.25,N/A,0
-<BLANKLINE>
-
-Individual values of the results can be accessed via the attributes of the
-``CategoricalStatsResults`` class:
-
->>> results.statistic
-0.25
->>> print results.p_value
-None
->>> results.permutations
-0
+>>> anosim(0)
+Method name               ANOSIM
+Sample size                    4
+Number of groups               2
+R statistic                 0.25
+p-value                      N/A
+Number of permutations         0
+dtype: object
 
 You can also provide a ``pandas.DataFrame`` and a column denoting the grouping
 instead of a grouping vector. The following data frame's ``Group`` column
@@ -253,15 +238,16 @@ examples:
 ...     {'Group': {'s2': 'Group1', 's3': 'Group2', 's4': 'Group2',
 ...                's5': 'Group3', 's1': 'Group1'}})
 >>> anosim = ANOSIM(dm, df, column='Group')
->>> results = anosim(99)
->>> print results
-Method name  Sample size  Number of groups  R statistic  p-value  \
-Number of permutations
-     ANOSIM            4                 2         0.25     0.67  \
-                    99
-<BLANKLINE>
+>>> anosim(99)
+Method name               ANOSIM
+Sample size                    4
+Number of groups               2
+R statistic                 0.25
+p-value                     0.67
+Number of permutations        99
+dtype: object
 
-The results match the results we saw in the first example above.
+The results match the first example above.
 
 Note that when providing a data frame, the ordering of rows and/or columns does
 not affect the grouping vector that is extracted. The data frame must be
@@ -291,7 +277,7 @@ References
 
 from ._base import (DissimilarityMatrixError, DistanceMatrixError,
                     MissingIDError, DissimilarityMatrix, DistanceMatrix,
-                    CategoricalStatsResults, randdm)
+                    randdm)
 from ._bioenv import bioenv
 from ._anosim import ANOSIM
 from ._permanova import PERMANOVA
@@ -299,8 +285,7 @@ from ._mantel import mantel, pwmantel
 
 __all__ = ['DissimilarityMatrixError', 'DistanceMatrixError', 'MissingIDError',
            'DissimilarityMatrix', 'DistanceMatrix', 'randdm', 'ANOSIM',
-           'PERMANOVA', 'CategoricalStatsResults', 'bioenv', 'mantel',
-           'pwmantel']
+           'PERMANOVA', 'bioenv', 'mantel', 'pwmantel']
 
 from numpy.testing import Tester
 test = Tester().test
